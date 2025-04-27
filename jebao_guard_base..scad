@@ -32,8 +32,13 @@ module openings(count=4, radius=50, size=10) {
 
 difference() {
     union() {
-        OuterThread(height=4);
-        InnerThread(height=4);
+        OuterThread(height=6);
+        InnerThread(height=6);
+        difference() {
+            cylinder(2, r=87/2);
+            translate([0, 0, - 5])
+            cylinder(10, r=33);
+        }
     }
     openings(count=24, radius=34, size=6.5);
 }
