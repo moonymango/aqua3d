@@ -21,11 +21,17 @@ module OuterThread(height=9, inner_radius=33) {
 }
 
 
-module openings(count=4, radius=50, size=10) {
+module holes(count=4, radius=50, size=10) {
     for (i=[0:1:count-1]) {
         angle = 360/count*i;
         echo(angle);
-        rotate([0, 0, angle]) translate([radius, 0, -50]) cylinder(100, r=size/2);
+        rotate([0, 0, angle]) 
+            translate([radius, 0, -50]) 
+                hull() {
+                    cylinder(100, r=size/2);
+                    translate([4, 0, 0])
+                    cylinder(100, r=size/2);
+                }
     }
 }
 
@@ -35,12 +41,12 @@ difference() {
         OuterThread(height=6);
         InnerThread(height=6);
         difference() {
-            cylinder(2, r=87/2);
+            cylinder(2, r=90/2);
             translate([0, 0, - 5])
             cylinder(10, r=33);
         }
     }
-    openings(count=24, radius=34, size=6.5);
+    holes(count=31, radius=33, size=4.5);
 }
 
      

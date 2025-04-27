@@ -3,6 +3,14 @@ use <threads.scad>
 $fa = 1;
 $fs = 0.4;
 
+module copy_rotate(degrees,vec){
+    children();
+    rotate(degrees, vec)
+    children();
+}
+
+
+
 module InnerThread(height= 4, outer_radius=45) {
     difference() {
         cylinder(height, r=outer_radius);
@@ -11,13 +19,16 @@ module InnerThread(height= 4, outer_radius=45) {
     }
 }
 
-module hole(count=50, size=4.5) {
+module hole0(count=42, size=4.5) {
     for (i=[0:1:count-1]) {
         angle = 360/count*i;
         echo(angle);
         rotate([0, 0, angle])
         rotate([0, 90, 0])
-        cylinder(100, r=size/2);
+        hull() {
+            cylinder(100, r=size/2);
+            translate([-5, 0, 0]) cylinder(100, r=size/2);
+        }
     }
 }
 
@@ -29,36 +40,41 @@ module Wall(height=30) {
             cylinder(100, r=43);
         
         // create holes
-        translate([0, 0, 5])
-        hole();
+        translate([0, 0, 6])
+        hole0();
         
-        translate([0, 0, 11])
-        hole();
-        
-        translate([0, 0, 17])
-        hole();
-        
-        translate([0, 0, 23])
-        hole();
+        translate([0, 0, 18])
+        hole0();
     }
 }
 
+
+module hole1(radius=42, size=4.5, dist=7) {
+    for (i=[0:radius-1]) {
+        if (i%dist==0) {
+            echo(i);
+            
+            copy_rotate(180, [1, 0, 0])
+            copy_rotate(180, [0, 1, 0])
+            translate([0, 0, -50])
+            hull() {
+                translate([i, dist/2, 0])
+                cylinder(100, r=size/2);
+                y = (radius^2-i^2)^(0.5)-dist/2;
+                translate([i, y, 0])
+                cylinder(100, r=size/2);
+            }
+        }
+    }    
+    
+}
 
 module Front() {
     difference() {
         cylinder(2, r=45);
     
         // create holes
-        lim = 10;
-        dist = 5.4;
-        for (x=[-lim:1:lim]) {
-            for (y=[-lim: 1: lim]) {
-                xx = x*dist;
-                yy = y*dist;
-                translate([xx, yy, -50])
-                cylinder(100, r=4.5/2);
-            }   
-        }
+        hole1();
     }
 }
 
@@ -76,21 +92,3 @@ module obj(height=30) {
 
 obj();
 
-/**
-for (i=[0:1:20]) {
-    angle = 360/20*i;
-    echo(angle);
-    rotate([0, 0, angle]) translate([radius, 0, -50]) cylinder(100, r=size/2);
-}
-*/
-
-/**
-difference() {
-    union() {
-        InnerThread(height=4);
-    }
-    openings(count=24, radius=34, size=6.5);
-}
-
-*/  
-  
