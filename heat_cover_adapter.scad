@@ -1,22 +1,53 @@
 
-$fn = 120;
+$fn = 320;
 
-height = 15;
-dia = 154;
-thickness = 5;
-outer = 20;
+height = 60;
+dia = 151;
+thickness = 10;
+outer = 28;
 
-difference() {
-    
-    
-    union() {
-        cylinder(h = height, r = dia/2);
-        cylinder(h = thickness, r = dia/2 + outer);
-    }
-    cylinder(h = 100, r = dia/2-thickness, center = true);
+module Profile()
+{
+    offset(r=+3) offset(delta=-3)
+    polygon([[0,height], 
+            [thickness, height], 
+            [thickness, 25], 
+            [3, 15], 
+            [3, 5], 
+            [-2, 0], 
+            [-outer, 0], 
+            [-outer, thickness],  
+            [-thickness, thickness], 
+            [-thickness, 18], 
+            [0, 30]]);
 }
 
-//translate([22, 16, 0])
-//rotate(90, [1, 0, 0])
-//linear_extrude(32, true)
-//polygon([[0,0], [9, 0], [8.5, 30], [5.5, 30], [6, 3], [0, 3]]);
+//Profile();
+
+module Ring() {
+    rotate_extrude()
+    translate([-dia/2, 0, 0])
+    Profile();
+}
+
+
+module Magnet(instance, total) {
+    height = 50;
+    angle = 360/total * instance;
+    rotate(angle, [0, 0, 1])
+    translate([180/2, 0, height/2 + 1])
+    cube([11, 25, height], center=true);
+}
+
+//Magnet(5, 6);
+
+module Final() {
+    difference() {
+    
+        Ring();
+        for(i = [1 : 6]) Magnet(i, 6);
+    }
+}
+
+Final();
+
